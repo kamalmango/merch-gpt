@@ -57,7 +57,8 @@ const Customizer = () => {
       const response = await fetch('https://merch-gpt-production.up.railway.app/api/v1/dalle', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
           prompt,
