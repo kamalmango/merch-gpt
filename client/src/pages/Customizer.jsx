@@ -24,6 +24,19 @@ const Customizer = () => {
     stylishShirt: false,
   })
 
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timeout = setTimeout(() => {
+        setErrorMessage('');
+      }, 5000); // Clear the error message after 5 seconds
+  
+      return () => clearTimeout(timeout); // Clean up the timeout when the component unmounts or the error message changes
+    }
+  }, [errorMessage]);
+
+
   // show tab content depending on the activeTab
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -67,7 +80,14 @@ const Customizer = () => {
 
       const data = await response.json();
 
-      handleDecals(type, `data:image/png;base64,${data.photo}`)
+      // handleDecals(type, `data:image/png;base64,${data.photo}`)
+      if (data && data.photo) {
+        handleDecals(type, `data:image/png;base64,${data.photo}`);
+        setErrorMessage(''); // Clear the error message if the response is valid
+      } else {
+        console.error("Invalid response from server:", data);
+        setErrorMessage('An error occurred while generating the image. Please try again.');
+      }
     } catch (error) {
       alert(error)
     } finally {
@@ -122,6 +142,13 @@ const Customizer = () => {
     <AnimatePresence>
       {!snap.intro && (
         <>
+         {errorMessage && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
+              <div className="bg-red-500 text-white px-6 py-4 rounded shadow-lg">
+                {errorMessage}
+              </div>
+            </div>
+          )}
           <motion.div
             key="custom"
             className="absolute top-0 left-0 z-10"
